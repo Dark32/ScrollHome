@@ -1,0 +1,9 @@
+name: ScrollHome
+main:  ru.mcnw.dark32.scrollhome.Main
+version: 1.0.1
+commands:
+   scroll:
+      description: This is a demo command.
+      usage: /<command> [player]
+      permission: <plugin name>.basic
+      permission-message: You don't have <permission>
