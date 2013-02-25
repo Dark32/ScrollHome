@@ -40,12 +40,12 @@ public class ScrollCommandExecutor implements CommandExecutor {
                     }
                     if (args[0].equals("to") && Main.hasPermission(player, "scroll.to")) {
                         player.teleport(Main.getHome(player).location);
-                        player.sendMessage(ChatColor.YELLOW + "Добро пожаловать домой, " + player.getDisplayName());
+                        player.sendMessage(ChatColor.YELLOW + "Добро пожаловать домой, " + player.getName());
                         return true;
                     }
                     if (args[0].equals("save") && Main.hasPermission(player, "scroll.save")) {
                         Main.saveHomes();
-                        player.sendMessage(ChatColor.YELLOW + "Настройки сохранены, " + player.getDisplayName());
+                        player.sendMessage(ChatColor.YELLOW + "Настройки сохранены, " + player.getName());
                         return true;
                     }
                     if (args[0].equals("set") && Main.hasPermission(player, "scroll.set")) {
@@ -55,16 +55,16 @@ public class ScrollCommandExecutor implements CommandExecutor {
                         } else {
                             Main.addHome(player);
                         }
-                        player.sendMessage(ChatColor.YELLOW + "Новый дом задан, " + player.getDisplayName());
+                        player.sendMessage(ChatColor.YELLOW + "Новый дом задан, " + player.getName());
                         return true;
                     }
                     if ((args[0].equals("remove") || args[0].equals("delete") || args[0].equals("del"))
                             && Main.hasPermission(player, "scroll.remove")) {
                         if (Main.isHome(player)) {
                             Main.removeHome(player);
-                            player.sendMessage(ChatColor.YELLOW + "Дом удалён, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Дом удалён, " + player.getName());
                         } else {
-                            player.sendMessage(ChatColor.YELLOW + "Невозможно удалить не заданный дом, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Невозможно удалить не заданный дом, " + player.getName());
                         }
                         return true;
                     }
@@ -74,19 +74,19 @@ public class ScrollCommandExecutor implements CommandExecutor {
                             && Main.hasPermission(player, "scroll.remove")) {
                         if (Main.isHome(args[1])) {
                             Main.removeHome(args[1]);
-                            player.sendMessage(ChatColor.YELLOW + "Дом " + args[1] + " удалён, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Дом " + args[1] + " удалён, " + player.getName());
                         } else {
-                            player.sendMessage(ChatColor.YELLOW + "Невозможно удалить не заданный дом, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Невозможно удалить не заданный дом, " + player.getName());
                         }
                         return true;
                     }
                     if (args[0].equals("to") && Main.hasPermission(player, "scroll.to")) {
                         if (Main.isHome(args[1])) {
                             player.teleport(Main.getHome(args[1]).location);
-                            player.sendMessage(ChatColor.YELLOW + "Добро пожаловать в дом игрока " + args[1] + ", " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Добро пожаловать в дом игрока " + args[1] + ", " + player.getName());
                             return true;
                         } else {
-                            player.sendMessage(ChatColor.YELLOW + "Дом не найден, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Дом не найден, " + player.getName());
                             return true;
                         }
                     }
@@ -94,11 +94,11 @@ public class ScrollCommandExecutor implements CommandExecutor {
                         if (Main.isHome(args[1])) {
                             Main.removeHome(player);
                             Main.addHome(args[1], player.getLocation());
-                            player.sendMessage(ChatColor.YELLOW + "Дом для " + args[1] + " задан, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Дом для " + args[1] + " задан, " + player.getName());
                             return true;
                         } else {
                             Main.addHome(args[1], player.getLocation());
-                            player.sendMessage(ChatColor.YELLOW + "Дом для " + args[1] + " задан, " + player.getDisplayName());
+                            player.sendMessage(ChatColor.YELLOW + "Дом для " + args[1] + " задан, " + player.getName());
                             return true;
                         }
                     }
@@ -116,7 +116,9 @@ public class ScrollCommandExecutor implements CommandExecutor {
         if (player != null) {
             sender.sendMessage("Добро пожаловать пользователь.");
         }
-        sender.sendMessage("ScrollHome ver.1.0.3");
+        sender.sendMessage("ScrollHome ver."+Main.version);
+        sender.sendMessage("Автор: dark32");
+        sender.sendMessage("Плагин разработан специально для mcnw.ru");
         helpmsg(player, sender, "scroll.help", ChatColor.GOLD + "/scroll [help]" + ChatColor.WHITE + "- для вызова справки");
         helpmsg(player, sender, "scroll.list", ChatColor.GOLD + "/scroll list" + ChatColor.WHITE + "- для просмотра всех домов");
         helpmsg(player, sender, "scroll.to", ChatColor.GOLD + "/scroll to [имя]" + ChatColor.WHITE + " - для телепортации в дом игрока");

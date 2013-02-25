@@ -22,7 +22,7 @@ public class Scroll implements Listener {
     private static Main plugin;
 
     public Scroll(Main pluging) {
-        this.plugin = pluging;
+        Scroll.plugin = pluging;
     }
 
     @EventHandler
@@ -31,12 +31,12 @@ public class Scroll implements Listener {
         Action action = event.getAction();
         ItemStack item = event.getItem();
         Block block = event.getClickedBlock();
-        if (item != null && item.getTypeId() == Main.item_scroll) {
-            if (action == Action.RIGHT_CLICK_BLOCK && block.getTypeId() == Main.block_scroll) {
+        if (item != null && item.getTypeId() == Main.item_scroll && item.getDurability()==Main.item_scroll_sub) {
+            if (action == Action.RIGHT_CLICK_BLOCK && block.getTypeId() == Main.block_scroll && block.getData()==Main.block_scroll_sub) {
                 Main.removeHome(player);
                 Main.addHome(player);
                 //player.setBedSpawnLocation(Main.getHome(player).location);
-                player.sendMessage(ChatColor.YELLOW + "Новый дом задан, " + player.getDisplayName());
+                player.sendMessage(ChatColor.YELLOW + "Новый дом задан, " + player.getName());
                 Main.saveHomes();
                 return;
             }
@@ -52,17 +52,17 @@ public class Scroll implements Listener {
                     }
 
 
-                    player.sendMessage(ChatColor.YELLOW + "Добро пожаловать домой, " + player.getDisplayName());
+                    player.sendMessage(ChatColor.YELLOW + "Добро пожаловать домой, " + player.getName());
 
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "Ваш дом не найден, " + player.getDisplayName());
+                    player.sendMessage(ChatColor.YELLOW + "Ваш дом не найден, " + player.getName());
                 }
                 return;
             }
         } else {
             if (action == Action.RIGHT_CLICK_BLOCK && block.getTypeId() == Main.block_scroll) {
                 Main.removeHome(player);
-                player.sendMessage(ChatColor.YELLOW + "Ваш дом очищен, " + player.getDisplayName());
+                player.sendMessage(ChatColor.YELLOW + "Ваш дом очищен, " + player.getName());
             }
 
         }
