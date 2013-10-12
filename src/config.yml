@@ -1,6 +1,8 @@
 Scroll:
-  id: 693
+  id: 339
   sub: 0
+  ma: PAPER
 Block:
-  id: 214
+  id: 20
   sub: 0 
+  ma: GLASS

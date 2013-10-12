@@ -9,9 +9,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -21,186 +21,191 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class Main extends JavaPlugin {
 
-    static boolean usePEX = false;
-    static boolean usePB = false;
-    public PluginManager pm;
-    public static int item_scroll = 693;
-    public static int item_scroll_sub = 0;
-    public static int block_scroll = 214;
-    public static int block_scroll_sub = 0;
-    public static ArrayList<Home> homes = new ArrayList<Home>();
-    public static Logger log;
-    public static String version = "1.0.4a";
+	static boolean usePEX = false;
+	static boolean usePB = false;
+	public PluginManager pm;
+	public static int item_scroll = 693;
+	public static int item_scroll_sub = 0;
+	public static int block_scroll = 214;
+	public static int block_scroll_sub = 0;
+	public static ArrayList<Home> homes = new ArrayList<Home>();
+	public static Logger log;
+	public static String version = "1.0.4b";
+	public static Material item_scrollMa;
+	public static Material block_scrollMa;
 
-    @Override
-    public void onEnable() {
-        log = getServer().getLogger();
-        pm = Bukkit.getPluginManager();
-        if (pm.getPlugin("PermissionsEx") != null) {
-            usePEX = true;
-        } else if (pm.getPlugin("PermissionsBukkit") != null) {
-            usePB = true;
-        } else {
-            getLogger().warning("Permissions plugins not found!");
-        }
-        File fileConf = new File(getDataFolder(), "config.yml");
-        if (!fileConf.exists()) {
-            this.saveDefaultConfig();
-        }
-        
-        FileConfiguration config = this.getConfig();
-        item_scroll = config.getInt("Scroll.id");
-        block_scroll = config.getInt("Block.id");
-        item_scroll_sub = config.getInt("Scroll.sub");
-        block_scroll_sub = config.getInt("Block.sub");
-        getCommand("scroll").setExecutor(new ScrollCommandExecutor(this));
-        getServer().getPluginManager().registerEvents(new Scroll(this), this);
-        loadHomes();
-        getLogger().info("load");
-    }
+	@Override
+	public void onEnable() {
+		log = getServer().getLogger();
+		pm = Bukkit.getPluginManager();
+		if (pm.getPlugin("PermissionsEx") != null) {
+			usePEX = true;
+		} else if (pm.getPlugin("PermissionsBukkit") != null) {
+			usePB = true;
+		} else {
+			getLogger().warning("Permissions plugins not found!");
+		}
+		File fileConf = new File(getDataFolder(), "config.yml");
+		if (!fileConf.exists()) {
+			this.saveDefaultConfig();
+		}
 
-    @Override
-    public void onDisable() {
-        saveHomes();
-        getLogger().info("dsable");
-    }
+		FileConfiguration config = this.getConfig();
+		item_scroll_sub = config.getInt("Scroll.sub");
+		block_scroll_sub = config.getInt("Block.sub");
+		item_scrollMa = Material.getMaterial(config.getString("Scroll.ma"));
+		block_scrollMa = Material.getMaterial(config.getString("Block.ma"));
 
-    public static boolean hasPermission(Player player, String permission) {
-        if (usePEX) {
-            return PermissionsEx.getUser(player).has(permission);
-        } else if (usePB) {
-            return player.hasPermission(permission);
-        } else {
-            return player.isOp();
-        }
-    }
-    //---------------------------------------------------
-    // технические функции 1
-    //---------------------------------------------------
+		getCommand("scroll").setExecutor(new ScrollCommandExecutor(this));
+		getServer().getPluginManager().registerEvents(new Scroll(this), this);
+		loadHomes();
+		getLogger().info("load");
+	}
 
-    public static void addHome(String s, Location l) {
-        homes.add(new Home(s, l));
-    }
+	@Override
+	public void onDisable() {
+		saveHomes();
+		getLogger().info("dsable");
+	}
 
-    public static void addHome(Player p) {
-        homes.add(new Home(p.getName(), p.getLocation()));
-    }
+	public static boolean hasPermission(Player player, String permission) {
+		if (usePEX) {
+			return PermissionsEx.getUser(player).has(permission);
+		} else if (usePB) {
+			return player.hasPermission(permission);
+		} else {
+			return player.isOp();
+		}
+	}
 
-    public static boolean isHome(String s) { //есть ли дом
-        for (Home h : homes) {
-            if (h.name.equalsIgnoreCase(s)) {
-                return true;
-            }
-        }
+	//---------------------------------------------------
+	// технические функции 1
+	//---------------------------------------------------
 
-        return false;
-    }
+	public static void addHome(String s, Location l) {
+		homes.add(new Home(s, l));
+	}
 
-    public static boolean isHome(Player p) { //есть ли дом
-        return isHome(p.getName());
-    }
+	public static void addHome(Player p) {
+		homes.add(new Home(p.getName(), p.getLocation()));
+	}
 
-    public static Home getHome(String s) {//вернуть дом
-        if (isHome(s)) {
-            for (Home h : homes) {
-                if (h.name.equalsIgnoreCase(s)) {
-                    return h;
-                }
-            }
-        }
-        return null;
-    }
+	public static boolean isHome(String s) { //есть ли дом
+		for (Home h : homes) {
+			if (h.name.equalsIgnoreCase(s)) {
+				return true;
+			}
+		}
 
-    public static Home getHome(Player p) {//вернуть дом
-        return getHome(p.getName());
-    }
+		return false;
+	}
 
-    public static void removeHome(String s) { //удаление дома
-        if (isHome(s)) {
-            homes.remove(getHome(s));
-            removeHome(s);
-        }
-    }
+	public static boolean isHome(Player p) { //есть ли дом
+		return isHome(p.getName());
+	}
 
-    public static void removeHome(Player p) { //удаление дома
-        removeHome(p.getName());
-    }
+	public static Home getHome(String s) {//вернуть дом
+		if (isHome(s)) {
+			for (Home h : homes) {
+				if (h.name.equalsIgnoreCase(s)) {
+					return h;
+				}
+			}
+		}
+		return null;
+	}
 
-    public static void removeAllHome() { //удаление
-        for (Home h : homes) {
-            homes.remove(h);
-        }
-    }
-    //---------------------------------------------------
-    // технические функции 2
-    //---------------------------------------------------
+	public static Home getHome(Player p) {//вернуть дом
+		return getHome(p.getName());
+	}
 
-    public void loadHomes() {// загружаемдома
-        String fName = "homes.data";
-        File file = new File("plugins/ScrollHome/" + fName);
-        if (file.exists()) {
-            try {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file.getAbsolutePath()));
-                Object result = ois.readObject();
-                ois.close();
-                if (result != null) {
-                    ArrayList<String> parse = (ArrayList<String>) result;
-                    for (String i : parse) {
-                        try {
-                            String[] args = i.split(",");
-                            Location warpL = new Location(getServer().getWorld(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Float.parseFloat(args[5]), Float.parseFloat(args[6]));
-                            Home warp = new Home(args[0], warpL);
-                            homes.add(warp);
-                            ois.close();
-                        } catch (Exception e) {
-                            System.out.println("Ошибка загрузки базы домов.");
-                            System.out.println(e);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Ошибка загрузки базы домов.");
-                System.out.println(e);
-            }
-        }
-    }
+	public static void removeHome(String s) { //удаление дома
+		if (isHome(s)) {
+			homes.remove(getHome(s));
+			removeHome(s);
+		}
+	}
 
-    public static void saveHomes() {//сохраняем
-        String fName = "homes.data";
-        ArrayList<String> format = new ArrayList<String>();
-        for (Home h : homes) {
-            String toAdd = h.name;
+	public static void removeHome(Player p) { //удаление дома
+		removeHome(p.getName());
+	}
 
-            toAdd += "," + h.location.getWorld().getName();
-            toAdd += "," + h.location.getBlockX();
-            toAdd += "," + h.location.getBlockY();
-            toAdd += "," + h.location.getBlockZ();
-            toAdd += "," + h.location.getYaw();
-            toAdd += "," + h.location.getPitch();
-            format.add(toAdd);
-        }
+	public static void removeAllHome() { //удаление
+		for (Home h : homes) {
+			homes.remove(h);
+		}
+	}
 
-        File file = new File("plugins/ScrollHome/" + fName);
+	//---------------------------------------------------
+	// технические функции 2
+	//---------------------------------------------------
 
-        new File("plugins/").mkdir();
-        new File("plugins/ScrollHome/").mkdir();
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                System.out.println("Не удалось сохранить базу домов");
-                System.out.println(e);
-            }
-        }
+	public void loadHomes() {// загружаемдома
+		String fName = "homes.data";
+		File file = new File("plugins/ScrollHome/" + fName);
+		if (file.exists()) {
+			try {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file.getAbsolutePath()));
+				Object result = ois.readObject();
+				ois.close();
+				if (result != null) {
+					ArrayList<String> parse = (ArrayList<String>) result;
+					for (String i : parse) {
+						try {
+							String[] args = i.split(",");
+							Location warpL = new Location(getServer().getWorld(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Float.parseFloat(args[5]), Float.parseFloat(args[6]));
+							Home warp = new Home(args[0], warpL);
+							homes.add(warp);
+							ois.close();
+						} catch (Exception e) {
+							System.out.println("Ошибка загрузки базы домов.");
+							System.out.println(e);
+						}
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("Ошибка загрузки базы домов.");
+				System.out.println(e);
+			}
+		}
+	}
 
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
-            oos.writeObject(format);
-            oos.flush();
-            oos.close();
-        } catch (Exception e) {
-            System.out.println("Не удалось сохранить базу домов");
-            System.out.println(e);
-        }
-    }
+	public static void saveHomes() {//сохраняем
+		String fName = "homes.data";
+		ArrayList<String> format = new ArrayList<String>();
+		for (Home h : homes) {
+			String toAdd = h.name;
+
+			toAdd += "," + h.location.getWorld().getName();
+			toAdd += "," + h.location.getBlockX();
+			toAdd += "," + h.location.getBlockY();
+			toAdd += "," + h.location.getBlockZ();
+			toAdd += "," + h.location.getYaw();
+			toAdd += "," + h.location.getPitch();
+			format.add(toAdd);
+		}
+
+		File file = new File("plugins/ScrollHome/" + fName);
+
+		new File("plugins/").mkdir();
+		new File("plugins/ScrollHome/").mkdir();
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				System.out.println("Не удалось сохранить базу домов");
+				System.out.println(e);
+			}
+		}
+
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file.getAbsolutePath()));
+			oos.writeObject(format);
+			oos.flush();
+			oos.close();
+		} catch (Exception e) {
+			System.out.println("Не удалось сохранить базу домов");
+			System.out.println(e);
+		}
+	}
 }
